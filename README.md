@@ -286,3 +286,4 @@ For issues and questions:
 ---
 
 **Note**: This framework is designed for educational and testing purposes. Please respect Twitch's terms of service and rate limits when running tests.
+# Updated git configuration
