@@ -2,6 +2,12 @@
 
 A comprehensive Selenium-based UI automation framework for testing Twitch web application using mobile emulation in Google Chrome.
 
+## 🎬 Demo
+
+![Twitch UI Automation Demo](demo_automation.gif)
+
+*Demo showing the complete 6-step automation workflow running locally*
+
 ## 📋 Overview
 
 This framework implements the required test case for Twitch UI automation:
