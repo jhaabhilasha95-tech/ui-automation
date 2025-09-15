@@ -42,8 +42,9 @@ class DriverManager:
         chrome_options.add_argument("--allow-running-insecure-content")
         chrome_options.add_argument("--disable-features=VizDisplayCompositor")
         
-        # Set window size
-        chrome_options.add_argument(f"--window-size={self.config.WINDOW_SIZE}")
+        # Set window size (only if not using mobile emulation)
+        if not self.config.MOBILE_EMULATION:
+            chrome_options.add_argument(f"--window-size={self.config.WINDOW_SIZE}")
         
         # Initialize driver
         service = Service(ChromeDriverManager().install())

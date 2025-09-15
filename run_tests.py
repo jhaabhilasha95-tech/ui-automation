@@ -29,7 +29,7 @@ def run_tests(test_type="all", verbose=False, headless=False):
     create_directories()
     
     # Base pytest command
-    cmd = ["python", "-m", "pytest"]
+    cmd = ["python3", "-m", "pytest"]
     
     # Add test selection
     if test_type == "smoke":
