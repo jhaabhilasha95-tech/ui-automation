@@ -32,6 +32,30 @@ class BasePage:
         element = self.wait_for_clickable(locator)
         element.click()
     
+    def click_element_with_retry(self, locator, max_retries=3):
+        """Click an element with retry logic to handle stale element references."""
+        from selenium.common.exceptions import StaleElementReferenceException
+        import time
+        
+        for attempt in range(max_retries):
+            try:
+                element = self.wait_for_clickable(locator)
+                element.click()
+                return True
+            except StaleElementReferenceException:
+                if attempt < max_retries - 1:
+                    print(f"⚠️ Stale element reference, retrying... (attempt {attempt + 1}/{max_retries})")
+                    time.sleep(1)
+                    continue
+                else:
+                    print(f"❌ Failed to click element after {max_retries} attempts due to stale element reference")
+                    return False
+            except Exception as e:
+                print(f"❌ Error clicking element: {e}")
+                return False
+        
+        return False
+    
     def send_keys_to_element(self, locator, text):
         """Send keys to an element."""
         element = self.wait_for_visible(locator)

@@ -52,12 +52,23 @@ class TestTwitchAdvancedWorkflow:
 
             # Click on StarCraft II result
             try:
-                starcraft_result = driver_manager.driver.find_element(By.XPATH, "//p[text()='StarCraft II']")
+                # Use WebDriverWait to avoid stale element reference
+                wait = WebDriverWait(driver_manager.driver, 10)
+                starcraft_result = wait.until(EC.element_to_be_clickable((By.XPATH, "//p[text()='StarCraft II']")))
                 starcraft_result.click()
                 print("✅ Clicked on StarCraft II search result")
                 time.sleep(3)  # Wait for page to load
-            except:
-                print("⚠️ Could not click on StarCraft II result, but continuing...")
+            except Exception as e:
+                print(f"⚠️ Could not click on StarCraft II result: {e}")
+                # Try alternative approach - find and click the parent link
+                try:
+                    starcraft_link = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[.//p[text()='StarCraft II']]")))
+                    starcraft_link.click()
+                    print("✅ Clicked on StarCraft II link (alternative approach)")
+                    time.sleep(3)
+                except Exception as e2:
+                    print(f"⚠️ Alternative click approach also failed: {e2}")
+                    print("⚠️ Continuing without clicking StarCraft II result...")
 
             # Scroll validation assertions
             wait = WebDriverWait(driver_manager.driver, 10)
@@ -183,12 +194,23 @@ class TestTwitchAdvancedWorkflow:
 
             # Click on StarCraft II result
             try:
-                starcraft_result = driver_manager.driver.find_element(By.XPATH, "//p[text()='StarCraft II']")
+                # Use WebDriverWait to avoid stale element reference
+                wait = WebDriverWait(driver_manager.driver, 10)
+                starcraft_result = wait.until(EC.element_to_be_clickable((By.XPATH, "//p[text()='StarCraft II']")))
                 starcraft_result.click()
                 print("✅ Clicked on StarCraft II search result")
                 time.sleep(3)  # Wait for page to load
-            except:
-                print("⚠️ Could not click on StarCraft II result, but continuing...")
+            except Exception as e:
+                print(f"⚠️ Could not click on StarCraft II result: {e}")
+                # Try alternative approach - find and click the parent link
+                try:
+                    starcraft_link = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[.//p[text()='StarCraft II']]")))
+                    starcraft_link.click()
+                    print("✅ Clicked on StarCraft II link (alternative approach)")
+                    time.sleep(3)
+                except Exception as e2:
+                    print(f"⚠️ Alternative click approach also failed: {e2}")
+                    print("⚠️ Continuing without clicking StarCraft II result...")
 
             # Scroll down 2 times
             print("📜 Scrolling down 2 times...")
