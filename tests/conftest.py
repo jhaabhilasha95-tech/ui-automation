@@ -3,37 +3,44 @@ Pytest configuration and fixtures for the Twitch UI automation framework.
 """
 import pytest
 import os
-from utils.driver_manager import DriverManager
-from pages.twitch_home_page import TwitchHomePage
-from pages.twitch_streamer_page import TwitchStreamerPage
+from utils.driver_factory import DriverFactory
+from pages.homepage import Homepage
+from pages.search_results_page import SearchResultsPage
+from pages.streamer_page import StreamerPage
 
 
 @pytest.fixture(scope="function")
 def driver_manager():
     """Create and manage WebDriver instance."""
-    driver_manager = DriverManager()
+    driver_manager = DriverFactory()
     driver_manager.setup_driver()
     yield driver_manager
     driver_manager.quit_driver()
 
 
 @pytest.fixture(scope="function")
-def twitch_home_page(driver_manager):
-    """Create Twitch home page instance."""
-    return TwitchHomePage(driver_manager)
+def homepage(driver_manager):
+    """Create Homepage instance."""
+    return Homepage(driver_manager)
 
 
 @pytest.fixture(scope="function")
-def twitch_streamer_page(driver_manager):
-    """Create Twitch streamer page instance."""
-    return TwitchStreamerPage(driver_manager)
+def search_results_page(driver_manager):
+    """Create SearchResultsPage instance."""
+    return SearchResultsPage(driver_manager)
 
 
 @pytest.fixture(scope="function")
-def setup_twitch_home(driver_manager, twitch_home_page):
+def streamer_page(driver_manager):
+    """Create StreamerPage instance."""
+    return StreamerPage(driver_manager)
+
+
+@pytest.fixture(scope="function")
+def setup_twitch_home(driver_manager, homepage):
     """Navigate to Twitch home page."""
     driver_manager.navigate_to_twitch()
-    return twitch_home_page
+    return homepage
 
 
 def pytest_configure(config):

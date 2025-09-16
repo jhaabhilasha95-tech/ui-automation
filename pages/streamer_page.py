@@ -1,11 +1,11 @@
 """
-Twitch streamer page object model.
+Streamer page interactions - wait for page load and take screenshots.
 """
 from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
 
 
-class TwitchStreamerPage(BasePage):
+class StreamerPage(BasePage):
     """Page object for Twitch streamer page."""
     
     # Locators
@@ -15,6 +15,12 @@ class TwitchStreamerPage(BasePage):
     STREAMER_NAME = (By.CSS_SELECTOR, "[data-a-target='stream-info-card-component__title']")
     FOLLOW_BUTTON = (By.CSS_SELECTOR, "[data-a-target='follow-button']")
     CHAT_CONTAINER = (By.CSS_SELECTOR, "[data-a-target='right-column__toggle-collapse-btn']")
+    
+    # Specific locators for CranKy_Ducklings streamer page
+    CRANKY_DUCKLINGS_TITLE = (By.XPATH, "//h1[@title='CranKy_Ducklings']")
+    CRANKY_DUCKLINGS_TITLE_TEXT = (By.XPATH, "//h1[text()='CranKy_Ducklings']")
+    SHARE_BUTTON = (By.CSS_SELECTOR, "[data-a-target='tw-core-button-label-text']")
+    PAGE_WRAPPER = (By.CSS_SELECTOR, "#page-main-content-wrapper")
     
     # Modal/Popup locators
     MODAL_CLOSE = (By.CSS_SELECTOR, "button[aria-label='Close']")
@@ -51,7 +57,14 @@ class TwitchStreamerPage(BasePage):
     def get_streamer_name(self):
         """Get the streamer's name."""
         try:
-            return self.get_element_text(self.STREAMER_NAME)
+            # Try to get CranKy_Ducklings name specifically
+            try:
+                return self.get_element_text(self.CRANKY_DUCKLINGS_TITLE)
+            except:
+                try:
+                    return self.get_element_text(self.CRANKY_DUCKLINGS_TITLE_TEXT)
+                except:
+                    return self.get_element_text(self.STREAMER_NAME)
         except:
             return "Unknown Streamer"
     
@@ -77,4 +90,58 @@ class TwitchStreamerPage(BasePage):
         """Check if the page has loaded properly."""
         return (self.is_element_visible(self.VIDEO_PLAYER) or 
                 self.is_element_visible(self.STREAMER_TITLE) or
-                self.is_element_visible(self.VIDEO_CONTAINER))
+                self.is_element_visible(self.VIDEO_CONTAINER) or
+                self.is_element_visible(self.CRANKY_DUCKLINGS_TITLE) or
+                self.is_element_visible(self.SHARE_BUTTON) or
+                self.is_element_visible(self.PAGE_WRAPPER))
+    
+    def is_cranky_ducklings_visible(self):
+        """Check if CranKy_Ducklings streamer name is visible."""
+        try:
+            return (self.is_element_visible(self.CRANKY_DUCKLINGS_TITLE) or 
+                    self.is_element_visible(self.CRANKY_DUCKLINGS_TITLE_TEXT))
+        except:
+            return False
+    
+    def is_share_button_visible(self):
+        """Check if Share this video button is visible."""
+        try:
+            return self.is_element_visible(self.SHARE_BUTTON)
+        except:
+            return False
+    
+    def is_page_wrapper_visible(self):
+        """Check if page main content wrapper is visible."""
+        try:
+            return self.is_element_visible(self.PAGE_WRAPPER)
+        except:
+            return False
+    
+    def is_video_player_visible(self):
+        """Check if video player is visible."""
+        try:
+            return self.is_element_visible(self.VIDEO_PLAYER)
+        except:
+            return False
+    
+    def is_stream_title_visible(self):
+        """Check if stream title is visible."""
+        try:
+            return self.is_element_visible(self.STREAMER_TITLE)
+        except:
+            return False
+    
+    def wait_for_all_elements(self):
+        """Wait for all key elements to be visible."""
+        import time
+        
+        # Wait for page to settle
+        time.sleep(3)
+        
+        # Handle any modal popups
+        self.handle_modal_popup()
+        
+        # Additional wait for page to settle
+        time.sleep(3)
+        
+        print("✅ Page settled after loading")

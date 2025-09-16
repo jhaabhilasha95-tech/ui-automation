@@ -5,16 +5,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from utils.driver_manager import DriverManager
+from utils.driver_factory import DriverFactory
+from utils.waits import WaitHelpers
+from utils.screenshot import ScreenshotHelper
 
 
 class BasePage:
     """Base page class with common functionality."""
     
-    def __init__(self, driver_manager: DriverManager):
-        self.driver = driver_manager.driver
-        self.wait = driver_manager.wait
+    def __init__(self, driver_manager):
         self.driver_manager = driver_manager
+        self.driver = driver_manager.driver
+        self.wait_helpers = WaitHelpers(self.driver)
+        self.screenshot_helper = ScreenshotHelper(self.driver)
     
     def find_element(self, locator):
         """Find a single element."""
@@ -58,15 +61,15 @@ class BasePage:
     
     def wait_for_clickable(self, locator, timeout=None):
         """Wait for element to be clickable."""
-        return self.driver_manager.wait_for_clickable(locator, timeout)
+        return self.wait_helpers.wait_for_element_clickable(locator, timeout)
     
     def wait_for_visible(self, locator, timeout=None):
         """Wait for element to be visible."""
-        return self.driver_manager.wait_for_visible(locator, timeout)
+        return self.wait_helpers.wait_for_element_visible(locator, timeout)
     
     def wait_for_element(self, locator, timeout=None):
         """Wait for element to be present."""
-        return self.driver_manager.wait_for_element(locator, timeout)
+        return self.wait_helpers.wait_for_element_present(locator, timeout)
     
     def scroll_to_element(self, locator):
         """Scroll to an element."""
@@ -75,4 +78,4 @@ class BasePage:
     
     def take_screenshot(self, filename):
         """Take a screenshot."""
-        return self.driver_manager.take_screenshot(filename)
+        return self.screenshot_helper.take_screenshot(filename)
