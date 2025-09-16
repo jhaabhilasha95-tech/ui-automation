@@ -19,7 +19,7 @@ class SearchResultsPage(BasePage):
     CRANKY_DUCKLINGS_NAME = (By.XPATH, "//p[text()='CranKy_Ducklings']")
     
     # StarCraft II specific locators
-    STARCRAFT_II_RESULT = (By.XPATH, "//p[text()='StarCraft II']")
+    STARCRAFT_II_RESULT = (By.XPATH, "//p[@title='StarCraft II' and @class='CoreText-sc-1txzju1-0 gQCPzm']")
     STARCRAFT_II_TITLE = (By.XPATH, "//h1[contains(@class, 'CoreText-sc-1txzju1-0') and contains(@class, 'kuIRux')]")
     FOLLOW_BUTTON = (By.CSS_SELECTOR, "[data-a-target='game-directory-follow-button']")
     
@@ -92,13 +92,27 @@ class SearchResultsPage(BasePage):
                         if element.tag_name == "p" and "CranKy_Ducklings" in element.text:
                             # Find the parent link element
                             parent_link = element.find_element(By.XPATH, "./ancestor::a")
-                            parent_link.click()
-                            print(f"Selected CranKy_Ducklings streamer using parent link")
-                            return True
+                            # Try multiple click methods to handle interception
+                            try:
+                                parent_link.click()
+                                print(f"Selected CranKy_Ducklings streamer using parent link")
+                                return True
+                            except Exception as click_e:
+                                # Try JavaScript click if regular click fails
+                                self.driver.execute_script("arguments[0].click();", parent_link)
+                                print(f"Selected CranKy_Ducklings streamer using JavaScript click")
+                                return True
                         else:
-                            element.click()
-                            print(f"Selected CranKy_Ducklings streamer using selector: {selector[1]}")
-                            return True
+                            # Try multiple click methods to handle interception
+                            try:
+                                element.click()
+                                print(f"Selected CranKy_Ducklings streamer using selector: {selector[1]}")
+                                return True
+                            except Exception as click_e:
+                                # Try JavaScript click if regular click fails
+                                self.driver.execute_script("arguments[0].click();", element)
+                                print(f"Selected CranKy_Ducklings streamer using JavaScript click with selector: {selector[1]}")
+                                return True
                 except Exception as e:
                     print(f"Failed to select CranKy_Ducklings with selector {selector[1]}: {e}")
                     continue
@@ -147,3 +161,4 @@ class SearchResultsPage(BasePage):
             return self.is_element_visible(self.FOLLOW_BUTTON)
         except:
             return False
+

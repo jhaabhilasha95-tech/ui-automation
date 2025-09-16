@@ -198,7 +198,7 @@ class TestTwitchBasicFunctionality:
 
             # Assert "StarCraft II" is displaying in the search results list
             try:
-                starcraft_result = wait.until(EC.presence_of_element_located((By.XPATH, "//p[text()='StarCraft II']")))
+                starcraft_result = wait.until(EC.presence_of_element_located((By.XPATH, "//p[@title='StarCraft II' and @class='CoreText-sc-1txzju1-0 gQCPzm']")))
                 assert starcraft_result.is_displayed(), "StarCraft II not found in search results"
                 print("✅ StarCraft II found in search results!")
             except:
@@ -206,22 +206,35 @@ class TestTwitchBasicFunctionality:
 
             # Click on StarCraft II result
             try:
-                # Re-find the element to avoid stale element reference
-                starcraft_result = wait.until(EC.element_to_be_clickable((By.XPATH, "//p[text()='StarCraft II']")))
-                starcraft_result.click()
-                print("✅ Clicked on StarCraft II search result")
+                # Try multiple selectors for StarCraft II
+                starcraft_selectors = [
+                    "//p[@title='StarCraft II' and @class='CoreText-sc-1txzju1-0 gQCPzm']",
+                    "//p[text()='StarCraft II']",
+                    "//p[contains(@class, 'CoreText-sc-1txzju1-0') and text()='StarCraft II']",
+                    "//a[.//p[text()='StarCraft II']]",
+                    "//a[contains(@href, '/directory/category/') and .//p[text()='StarCraft II']]"
+                ]
+                
+                starcraft_clicked = False
+                for selector in starcraft_selectors:
+                    try:
+                        starcraft_result = wait.until(EC.element_to_be_clickable((By.XPATH, selector)))
+                        starcraft_result.click()
+                        print(f"✅ Clicked on StarCraft II search result using selector: {selector}")
+                        starcraft_clicked = True
+                        break
+                    except Exception as e:
+                        print(f"⚠️ Selector failed: {selector} - {e}")
+                        continue
+                
+                if not starcraft_clicked:
+                    print("⚠️ All StarCraft II selectors failed, continuing without clicking...")
+                
                 time.sleep(3)  # Wait for page to load
+                
             except Exception as e:
                 print(f"⚠️ Could not click on StarCraft II result: {e}")
-                # Try alternative approach - find and click the parent link
-                try:
-                    starcraft_link = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[.//p[text()='StarCraft II']]")))
-                    starcraft_link.click()
-                    print("✅ Clicked on StarCraft II link (alternative approach)")
-                    time.sleep(3)
-                except Exception as e2:
-                    print(f"⚠️ Alternative click approach also failed: {e2}")
-                    print("⚠️ Continuing without clicking StarCraft II result...")
+                print("⚠️ Continuing without clicking StarCraft II result...")
 
             # Assert StarCraft II title and Follow button are displaying
             try:
