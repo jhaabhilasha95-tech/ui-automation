@@ -27,6 +27,11 @@ class DriverFactory:
             # Only apply window-size if mobile emulation is not active
             chrome_options.add_argument("--window-size=1920,1080")
         
+        # Add headless mode if specified
+        if self.config.HEADLESS:
+            chrome_options.add_argument("--headless=new")  # Use new headless mode
+            print("✅ Headless mode enabled with CI optimizations")
+        
         # Additional Chrome options
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
@@ -39,78 +44,84 @@ class DriverFactory:
         chrome_options.add_argument("--ignore-ssl-errors")
         chrome_options.add_argument("--ignore-certificate-errors-spki-list")
         
-        # Set up ChromeDriver with better error handling
+        # Set up ChromeDriver with robust executable detection
         import os
         import glob
         import shutil
         
-        # First, try to use system chromedriver (installed by GitHub Actions)
-        system_chromedriver = shutil.which('chromedriver')
-        if system_chromedriver:
-            print(f"🔍 Found system ChromeDriver: {system_chromedriver}")
+        def find_chromedriver_executable():
+            """Find the actual chromedriver executable, not text files."""
+            # First, try system chromedriver
+            system_chromedriver = shutil.which('chromedriver')
+            if system_chromedriver and os.access(system_chromedriver, os.X_OK):
+                print(f"✅ Found system ChromeDriver: {system_chromedriver}")
+                return system_chromedriver
+            
+            # Try ChromeDriverManager but validate the result
             try:
-                service = Service(system_chromedriver)
-                self.driver = webdriver.Chrome(service=service, options=chrome_options)
-                print("✅ Using system ChromeDriver successfully")
-            except Exception as e:
-                print(f"⚠️ System ChromeDriver failed: {e}")
-                system_chromedriver = None
-        
-        # If system chromedriver failed, try ChromeDriverManager with fixes
-        if not system_chromedriver:
-            try:
-                # Try to get the correct ChromeDriver path
                 driver_path = ChromeDriverManager().install()
-                print(f"🔍 ChromeDriverManager returned path: {driver_path}")
+                print(f"🔍 ChromeDriverManager returned: {driver_path}")
                 
-                # Check if the driver path is correct (not a text file)
-                if not driver_path.endswith('chromedriver') and not driver_path.endswith('chromedriver.exe'):
-                    print(f"⚠️ Wrong file detected: {driver_path}")
-                    # If we got a wrong file, try to find the correct one
-                    driver_dir = os.path.dirname(driver_path)
-                    print(f"🔍 Searching in directory: {driver_dir}")
-                    
-                    # Look for the actual chromedriver executable
-                    possible_paths = [
-                        os.path.join(driver_dir, 'chromedriver'),
-                        os.path.join(driver_dir, 'chromedriver.exe'),
-                        os.path.join(driver_dir, 'chromedriver-linux64', 'chromedriver'),
-                        os.path.join(driver_dir, 'chromedriver-linux64', 'chromedriver.exe'),
-                    ]
-                    
-                    for path in possible_paths:
-                        print(f"🔍 Checking path: {path}")
-                        if os.path.exists(path) and os.access(path, os.X_OK):
-                            driver_path = path
-                            print(f"✅ Found correct chromedriver at: {driver_path}")
-                            break
-                    else:
-                        # If still not found, try glob search
-                        print("🔍 Using glob search...")
-                        chromedriver_files = glob.glob(os.path.join(driver_dir, '**/chromedriver*'), recursive=True)
-                        print(f"🔍 Found files: {chromedriver_files}")
-                        for file_path in chromedriver_files:
-                            if os.path.isfile(file_path) and os.access(file_path, os.X_OK) and not file_path.endswith('.txt'):
-                                driver_path = file_path
-                                print(f"✅ Found correct chromedriver via glob: {driver_path}")
-                                break
+                # Check if it's the actual executable
+                if os.path.isfile(driver_path) and os.access(driver_path, os.X_OK):
+                    # Verify it's not a text file by checking if it's executable
+                    if not driver_path.endswith('.txt') and not 'THIRD_PARTY_NOTICES' in driver_path:
+                        print(f"✅ Found valid ChromeDriver: {driver_path}")
+                        return driver_path
                 
-                print(f"🚀 Using ChromeDriver path: {driver_path}")
+                # If we got a wrong file, search for the real one
+                print(f"⚠️ Invalid file detected: {driver_path}")
+                driver_dir = os.path.dirname(driver_path)
+                
+                # Search for actual chromedriver executable
+                search_patterns = [
+                    os.path.join(driver_dir, 'chromedriver'),
+                    os.path.join(driver_dir, 'chromedriver.exe'),
+                    os.path.join(driver_dir, 'chromedriver-linux64', 'chromedriver'),
+                    os.path.join(driver_dir, 'chromedriver-linux64', 'chromedriver.exe'),
+                ]
+                
+                for pattern in search_patterns:
+                    if os.path.exists(pattern) and os.access(pattern, os.X_OK):
+                        print(f"✅ Found correct ChromeDriver: {pattern}")
+                        return pattern
+                
+                # Use glob search as last resort
+                chromedriver_files = glob.glob(os.path.join(driver_dir, '**/chromedriver*'), recursive=True)
+                for file_path in chromedriver_files:
+                    if (os.path.isfile(file_path) and 
+                        os.access(file_path, os.X_OK) and 
+                        not file_path.endswith('.txt') and
+                        'THIRD_PARTY_NOTICES' not in file_path):
+                        print(f"✅ Found ChromeDriver via glob: {file_path}")
+                        return file_path
+                        
+            except Exception as e:
+                print(f"⚠️ ChromeDriverManager failed: {e}")
+            
+            return None
+        
+        # Find and use the correct ChromeDriver
+        driver_path = find_chromedriver_executable()
+        
+        if driver_path:
+            try:
                 service = Service(driver_path)
                 self.driver = webdriver.Chrome(service=service, options=chrome_options)
                 print("✅ ChromeDriver initialized successfully")
-                
             except Exception as e:
-                print(f"⚠️ ChromeDriverManager failed: {e}")
-                # Final fallback: try to use system chromedriver without path
-                try:
-                    print("🔄 Trying system ChromeDriver without path...")
-                    service = Service()  # Let Selenium find chromedriver in PATH
-                    self.driver = webdriver.Chrome(service=service, options=chrome_options)
-                    print("✅ Using system ChromeDriver")
-                except Exception as e2:
-                    print(f"❌ All ChromeDriver attempts failed: {e2}")
-                    raise Exception(f"Could not initialize ChromeDriver: {e}")
+                print(f"❌ Failed to initialize ChromeDriver with path {driver_path}: {e}")
+                raise Exception(f"Could not initialize ChromeDriver: {e}")
+        else:
+            # Final fallback: let Selenium find chromedriver in PATH
+            try:
+                print("🔄 Final fallback: letting Selenium find ChromeDriver in PATH")
+                service = Service()  # Let Selenium find chromedriver in PATH
+                self.driver = webdriver.Chrome(service=service, options=chrome_options)
+                print("✅ ChromeDriver found in PATH")
+            except Exception as e:
+                print(f"❌ All ChromeDriver attempts failed: {e}")
+                raise Exception(f"Could not initialize ChromeDriver: {e}")
         
         # Set timeouts
         self.driver.implicitly_wait(self.config.IMPLICIT_WAIT)
