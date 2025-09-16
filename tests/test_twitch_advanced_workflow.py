@@ -222,30 +222,8 @@ class TestTwitchAdvancedWorkflow:
 
             # Click on StarCraft II category link that appears after scrolling
             try:
-                # Use WebDriverWait to avoid stale element reference
-                wait = WebDriverWait(driver_manager.driver, 10)
-                
-                # Try multiple selectors for StarCraft II category link
-                starcraft_selectors = [
-                    "//*[@id='page-main-content-wrapper']/div[3]/div/div/div[3]/div/article/button",
-                    "//a[@class='ScCoreLink-sc-16kq0mq-0 kLgTJj tw-link' and @href='/directory/category/starcraft-ii' and text()='StarCraft II']",
-                    "//a[contains(@class, 'ScCoreLink-sc-16kq0mq-0') and contains(@class, 'tw-link') and @href='/directory/category/starcraft-ii']",
-                    "//a[@href='/directory/category/starcraft-ii' and text()='StarCraft II']",
-                    "//a[contains(@href, '/directory/category/starcraft-ii')]",
-                    "//a[text()='StarCraft II' and contains(@href, '/directory/category/')]"
-                ]
-                
-                starcraft_clicked = False
-                for selector in starcraft_selectors:
-                    try:
-                        starcraft_result = wait.until(EC.element_to_be_clickable((By.XPATH, selector)))
-                        starcraft_result.click()
-                        print(f"✅ Clicked on StarCraft II category link using selector: {selector}")
-                        starcraft_clicked = True
-                        break
-                    except Exception as e:
-                        print(f"⚠️ Selector failed: {selector} - {e}")
-                        continue
+                # Use the page object method for clicking StarCraft II category link
+                starcraft_clicked = search_results_page.click_starcraft_ii_category_link()
                 
                 if not starcraft_clicked:
                     print("⚠️ All StarCraft II category selectors failed, continuing without clicking...")

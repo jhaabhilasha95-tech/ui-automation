@@ -23,6 +23,16 @@ class SearchResultsPage(BasePage):
     STARCRAFT_II_TITLE = (By.XPATH, "//h1[contains(@class, 'CoreText-sc-1txzju1-0') and contains(@class, 'kuIRux')]")
     FOLLOW_BUTTON = (By.CSS_SELECTOR, "[data-a-target='game-directory-follow-button']")
     
+    # StarCraft II category link selectors (ordered by preference)
+    STARCRAFT_SELECTORS = [
+        "//*[@id='page-main-content-wrapper']/div[3]/div/div/div[3]/div/article/button",  # Special button selector that works well
+        "//a[@class='ScCoreLink-sc-16kq0mq-0 kLgTJj tw-link' and @href='/directory/category/starcraft-ii' and text()='StarCraft II']",
+        "//a[contains(@class, 'ScCoreLink-sc-16kq0mq-0') and contains(@class, 'tw-link') and @href='/directory/category/starcraft-ii']",
+        "//a[@href='/directory/category/starcraft-ii' and text()='StarCraft II']",
+        "//a[contains(@href, '/directory/category/starcraft-ii')]",
+        "//a[text()='StarCraft II' and contains(@href, '/directory/category/')]"
+    ]
+    
     def __init__(self, driver_manager):
         super().__init__(driver_manager)
     
@@ -160,5 +170,31 @@ class SearchResultsPage(BasePage):
         try:
             return self.is_element_visible(self.FOLLOW_BUTTON)
         except:
+            return False
+    
+    def click_starcraft_ii_category_link(self):
+        """Click on StarCraft II category link using multiple selectors."""
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.webdriver.common.by import By
+        
+        try:
+            wait = WebDriverWait(self.driver, 10)
+            
+            for selector in self.STARCRAFT_SELECTORS:
+                try:
+                    starcraft_result = wait.until(EC.element_to_be_clickable((By.XPATH, selector)))
+                    starcraft_result.click()
+                    print(f"✅ Clicked on StarCraft II category link using selector: {selector}")
+                    return True
+                except Exception as e:
+                    print(f"⚠️ Selector failed: {selector} - {e}")
+                    continue
+            
+            print("⚠️ All StarCraft II category selectors failed")
+            return False
+            
+        except Exception as e:
+            print(f"⚠️ Could not click on StarCraft II category link: {e}")
             return False
 
