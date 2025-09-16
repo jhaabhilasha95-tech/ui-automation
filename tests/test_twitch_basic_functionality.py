@@ -54,17 +54,17 @@ class TestTwitchBasicFunctionality:
             with allure.step("Verify Twitch logo visibility"):
                 # Assert Twitch logo is visible
                 if homepage.is_twitch_logo_visible():
-                print("✅ Twitch logo found and visible!")
-                
-                # Get the aria-label of the logo
-                aria_label = homepage.get_twitch_logo_aria_label()
-                if aria_label:
-                    print(f"✅ Twitch logo has correct aria-label: '{aria_label}'")
-                    assert "Go to the Twitch home page" in aria_label, f"Logo aria-label should contain 'Go to the Twitch home page', got: '{aria_label}'"
+                    print("✅ Twitch logo found and visible!")
+                    
+                    # Get the aria-label of the logo
+                    aria_label = homepage.get_twitch_logo_aria_label()
+                    if aria_label:
+                        print(f"✅ Twitch logo has correct aria-label: '{aria_label}'")
+                        assert "Go to the Twitch home page" in aria_label, f"Logo aria-label should contain 'Go to the Twitch home page', got: '{aria_label}'"
+                    else:
+                        print("⚠️ Could not get Twitch logo aria-label")
                 else:
-                    print("⚠️ Could not get Twitch logo aria-label")
-            else:
-                print("⚠️ Twitch logo not found or not visible")
+                    print("⚠️ Twitch logo not found or not visible")
 
             print("✅ Homepage navigation test completed successfully!")
 
