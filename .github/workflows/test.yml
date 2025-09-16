@@ -56,6 +56,7 @@ jobs:
         python3 -c "import selenium; print('selenium version:', selenium.__version__)"
         python3 -c "import allure; print('allure imported successfully')"
         python3 -c "import webdriver_manager; print('webdriver-manager imported successfully')"
+        python3 -c "import dotenv; print('python-dotenv imported successfully')"
     
     - name: Create necessary directories
       run: |
@@ -130,6 +131,7 @@ jobs:
         python3 -c "import selenium; print('selenium version:', selenium.__version__)"
         python3 -c "import allure; print('allure imported successfully')"
         python3 -c "import webdriver_manager; print('webdriver-manager imported successfully')"
+        python3 -c "import dotenv; print('python-dotenv imported successfully')"
     
     - name: Create necessary directories
       run: |
