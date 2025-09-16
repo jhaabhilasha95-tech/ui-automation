@@ -204,15 +204,23 @@ class TestTwitchBasicFunctionality:
             except:
                 print("⚠️ StarCraft II not found in search results, but continuing...")
 
-            # Click on StarCraft II result
+            # Scroll down first to load StarCraft II category link
+            print("📜 Scrolling down to load StarCraft II category...")
+            driver_manager.driver.execute_script("window.scrollBy(0, 500);")
+            time.sleep(1)
+            driver_manager.driver.execute_script("window.scrollBy(0, 500);")
+            time.sleep(1)
+            print("✅ Scrolled down to load content")
+
+            # Click on StarCraft II category link that appears after scrolling
             try:
-                # Try multiple selectors for StarCraft II
+                # Try multiple selectors for StarCraft II category link
                 starcraft_selectors = [
-                    "//p[@title='StarCraft II' and @class='CoreText-sc-1txzju1-0 gQCPzm']",
-                    "//p[text()='StarCraft II']",
-                    "//p[contains(@class, 'CoreText-sc-1txzju1-0') and text()='StarCraft II']",
-                    "//a[.//p[text()='StarCraft II']]",
-                    "//a[contains(@href, '/directory/category/') and .//p[text()='StarCraft II']]"
+                    "//a[@class='ScCoreLink-sc-16kq0mq-0 kLgTJj tw-link' and @href='/directory/category/starcraft-ii' and text()='StarCraft II']",
+                    "//a[contains(@class, 'ScCoreLink-sc-16kq0mq-0') and contains(@class, 'tw-link') and @href='/directory/category/starcraft-ii']",
+                    "//a[@href='/directory/category/starcraft-ii' and text()='StarCraft II']",
+                    "//a[contains(@href, '/directory/category/starcraft-ii')]",
+                    "//a[text()='StarCraft II' and contains(@href, '/directory/category/')]"
                 ]
                 
                 starcraft_clicked = False
@@ -220,7 +228,7 @@ class TestTwitchBasicFunctionality:
                     try:
                         starcraft_result = wait.until(EC.element_to_be_clickable((By.XPATH, selector)))
                         starcraft_result.click()
-                        print(f"✅ Clicked on StarCraft II search result using selector: {selector}")
+                        print(f"✅ Clicked on StarCraft II category link using selector: {selector}")
                         starcraft_clicked = True
                         break
                     except Exception as e:
@@ -228,13 +236,13 @@ class TestTwitchBasicFunctionality:
                         continue
                 
                 if not starcraft_clicked:
-                    print("⚠️ All StarCraft II selectors failed, continuing without clicking...")
+                    print("⚠️ All StarCraft II category selectors failed, continuing without clicking...")
                 
                 time.sleep(3)  # Wait for page to load
                 
             except Exception as e:
-                print(f"⚠️ Could not click on StarCraft II result: {e}")
-                print("⚠️ Continuing without clicking StarCraft II result...")
+                print(f"⚠️ Could not click on StarCraft II category link: {e}")
+                print("⚠️ Continuing without clicking StarCraft II category...")
 
             # Assert StarCraft II title and Follow button are displaying
             try:

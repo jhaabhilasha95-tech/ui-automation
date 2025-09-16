@@ -83,3 +83,4 @@ class WaitHelpers:
         """Wait for page to scroll to a specific position."""
         wait = WebDriverWait(self.driver, timeout)
         wait.until(lambda driver: abs(driver.execute_script("return window.pageYOffset;") - expected_position) < 10)
+

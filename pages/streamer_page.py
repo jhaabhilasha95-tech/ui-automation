@@ -16,9 +16,9 @@ class StreamerPage(BasePage):
     FOLLOW_BUTTON = (By.CSS_SELECTOR, "[data-a-target='follow-button']")
     CHAT_CONTAINER = (By.CSS_SELECTOR, "[data-a-target='right-column__toggle-collapse-btn']")
     
-    # Specific locators for CranKy_Ducklings streamer page
-    CRANKY_DUCKLINGS_TITLE = (By.XPATH, "//h1[@title='CranKy_Ducklings']")
-    CRANKY_DUCKLINGS_TITLE_TEXT = (By.XPATH, "//h1[text()='CranKy_Ducklings']")
+    # Generic locators for streamer page
+    STREAMER_TITLE = (By.XPATH, "//h1[@title]")
+    STREAMER_TITLE_TEXT = (By.XPATH, "//h1")
     SHARE_BUTTON = (By.CSS_SELECTOR, "[data-a-target='tw-core-button-label-text']")
     PAGE_WRAPPER = (By.CSS_SELECTOR, "#page-main-content-wrapper")
     
@@ -57,12 +57,12 @@ class StreamerPage(BasePage):
     def get_streamer_name(self):
         """Get the streamer's name."""
         try:
-            # Try to get CranKy_Ducklings name specifically
+            # Try to get streamer name
             try:
-                return self.get_element_text(self.CRANKY_DUCKLINGS_TITLE)
+                return self.get_element_text(self.STREAMER_TITLE)
             except:
                 try:
-                    return self.get_element_text(self.CRANKY_DUCKLINGS_TITLE_TEXT)
+                    return self.get_element_text(self.STREAMER_TITLE_TEXT)
                 except:
                     return self.get_element_text(self.STREAMER_NAME)
         except:
@@ -91,15 +91,15 @@ class StreamerPage(BasePage):
         return (self.is_element_visible(self.VIDEO_PLAYER) or 
                 self.is_element_visible(self.STREAMER_TITLE) or
                 self.is_element_visible(self.VIDEO_CONTAINER) or
-                self.is_element_visible(self.CRANKY_DUCKLINGS_TITLE) or
+                self.is_element_visible(self.STREAMER_TITLE) or
                 self.is_element_visible(self.SHARE_BUTTON) or
                 self.is_element_visible(self.PAGE_WRAPPER))
     
-    def is_cranky_ducklings_visible(self):
-        """Check if CranKy_Ducklings streamer name is visible."""
+    def is_streamer_name_visible(self):
+        """Check if streamer name is visible."""
         try:
-            return (self.is_element_visible(self.CRANKY_DUCKLINGS_TITLE) or 
-                    self.is_element_visible(self.CRANKY_DUCKLINGS_TITLE_TEXT))
+            return (self.is_element_visible(self.STREAMER_TITLE) or 
+                    self.is_element_visible(self.STREAMER_TITLE_TEXT))
         except:
             return False
     
@@ -145,3 +145,4 @@ class StreamerPage(BasePage):
         time.sleep(3)
         
         print("✅ Page settled after loading")
+

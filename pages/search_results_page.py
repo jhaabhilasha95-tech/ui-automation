@@ -13,10 +13,10 @@ class SearchResultsPage(BasePage):
     STREAMER_CARDS = (By.CSS_SELECTOR, "[data-a-target='search-result-card'], .search-result-card, [class*='search-result']")
     STREAMER_LINK = (By.CSS_SELECTOR, "a[data-a-target='search-result-card'], a[class*='search-result']")
     
-    # Specific locators for CranKy_Ducklings streamer
-    CRANKY_DUCKLINGS_THUMBNAIL = (By.XPATH, "//img[@alt='' and @class='tw-image' and contains(@src, 'cranky_ducklings')]")
-    CRANKY_DUCKLINGS_LINK = (By.XPATH, "//a[contains(@href, '/videos/') and .//p[text()='CranKy_Ducklings']]")
-    CRANKY_DUCKLINGS_NAME = (By.XPATH, "//p[text()='CranKy_Ducklings']")
+    # Generic locators for streamer elements
+    STREAMER_THUMBNAIL = (By.XPATH, "//img[@alt='' and @class='tw-image']")
+    STREAMER_LINK = (By.XPATH, "//a[contains(@href, '/videos/')]")
+    STREAMER_NAME = (By.XPATH, "//p[contains(@class, 'CoreText')]")
     
     # StarCraft II specific locators
     STARCRAFT_II_RESULT = (By.XPATH, "//p[@title='StarCraft II' and @class='CoreText-sc-1txzju1-0 gQCPzm']")
@@ -50,83 +50,83 @@ class SearchResultsPage(BasePage):
         """Get current scroll position."""
         return self.driver.execute_script("return window.pageYOffset;")
     
-    def is_cranky_ducklings_thumbnail_visible(self):
-        """Check if CranKy_Ducklings thumbnail is visible."""
+    def is_streamer_thumbnail_visible(self):
+        """Check if streamer thumbnail is visible."""
         try:
-            return self.is_element_visible(self.CRANKY_DUCKLINGS_THUMBNAIL)
+            return self.is_element_visible(self.STREAMER_THUMBNAIL)
         except:
             return False
     
-    def get_cranky_ducklings_thumbnail_src(self):
-        """Get the src attribute of CranKy_Ducklings thumbnail."""
+    def get_streamer_thumbnail_src(self):
+        """Get the src attribute of streamer thumbnail."""
         try:
-            thumbnail = self.find_element(self.CRANKY_DUCKLINGS_THUMBNAIL)
+            thumbnail = self.find_element(self.STREAMER_THUMBNAIL)
             return thumbnail.get_attribute("src")
         except:
             return None
     
-    def get_cranky_ducklings_thumbnail_class(self):
-        """Get the class attribute of CranKy_Ducklings thumbnail."""
+    def get_streamer_thumbnail_class(self):
+        """Get the class attribute of streamer thumbnail."""
         try:
-            thumbnail = self.find_element(self.CRANKY_DUCKLINGS_THUMBNAIL)
+            thumbnail = self.find_element(self.STREAMER_THUMBNAIL)
             return thumbnail.get_attribute("class")
         except:
             return None
     
-    def select_cranky_ducklings_streamer(self):
-        """Select the CranKy_Ducklings streamer specifically."""
+    def select_streamer(self):
+        """Select a streamer from search results."""
         try:
-            # First, try to find and click specifically on CranKy_Ducklings streamer
-            cranky_selectors = [
-                self.CRANKY_DUCKLINGS_LINK,
-                self.CRANKY_DUCKLINGS_NAME,
-                (By.XPATH, "//a[contains(@href, '/videos/') and .//img[contains(@src, 'cranky_ducklings')]]"),
+            # Try to find and click on a streamer
+            streamer_selectors = [
+                self.STREAMER_LINK,
+                self.STREAMER_NAME,
+                (By.XPATH, "//a[contains(@href, '/videos/')]"),
                 (By.XPATH, "/html/body/div[1]/main/div/div/section[4]/div[2]/a"),
-                (By.CSS_SELECTOR, "a[href='/videos/2566994857']"),
+                (By.CSS_SELECTOR, "a[href*='/videos/']"),
             ]
             
-            for selector in cranky_selectors:
+            for selector in streamer_selectors:
                 try:
                     if self.is_element_present(selector):
                         element = self.find_element(selector)
-                        if element.tag_name == "p" and "CranKy_Ducklings" in element.text:
+                        if element.tag_name == "p":
                             # Find the parent link element
                             parent_link = element.find_element(By.XPATH, "./ancestor::a")
                             # Try multiple click methods to handle interception
                             try:
                                 parent_link.click()
-                                print(f"Selected CranKy_Ducklings streamer using parent link")
+                                print(f"Selected streamer using parent link")
                                 return True
                             except Exception as click_e:
                                 # Try JavaScript click if regular click fails
                                 self.driver.execute_script("arguments[0].click();", parent_link)
-                                print(f"Selected CranKy_Ducklings streamer using JavaScript click")
+                                print(f"Selected streamer using JavaScript click")
                                 return True
                         else:
                             # Try multiple click methods to handle interception
                             try:
                                 element.click()
-                                print(f"Selected CranKy_Ducklings streamer using selector: {selector[1]}")
+                                print(f"Selected streamer using selector: {selector[1]}")
                                 return True
                             except Exception as click_e:
                                 # Try JavaScript click if regular click fails
                                 self.driver.execute_script("arguments[0].click();", element)
-                                print(f"Selected CranKy_Ducklings streamer using JavaScript click with selector: {selector[1]}")
+                                print(f"Selected streamer using JavaScript click with selector: {selector[1]}")
                                 return True
                 except Exception as e:
-                    print(f"Failed to select CranKy_Ducklings with selector {selector[1]}: {e}")
+                    print(f"Failed to select streamer with selector {selector[1]}: {e}")
                     continue
             
             return False
         except Exception as e:
-            print(f"Error selecting CranKy_Ducklings streamer: {e}")
+            print(f"Error selecting streamer: {e}")
             return False
     
     def select_first_streamer(self):
         """Select the first available streamer from search results."""
         try:
-            # First try to select CranKy_Ducklings specifically
-            if self.select_cranky_ducklings_streamer():
+            # First try to select a streamer
+            if self.select_streamer():
                 return True
             
             # Fallback: try to find any streamer

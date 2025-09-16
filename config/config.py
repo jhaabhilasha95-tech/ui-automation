@@ -42,3 +42,4 @@ class Config:
     # Wait conditions
     MODAL_WAIT_TIMEOUT = 10
     VIDEO_LOAD_TIMEOUT = 30
+
