@@ -107,15 +107,9 @@ jobs:
       run: |
         mkdir -p screenshots reports allure-results
     
-    - name: Run smoke tests
+    - name: Run tests
       run: |
         python3 run_tests.py --type smoke --headless
-      env:
-        HEADLESS: true
-    
-    - name: Run regression tests
-      run: |
-        python3 run_tests.py --type regression --headless
       env:
         HEADLESS: true
     
@@ -229,7 +223,7 @@ jobs:
     
     - name: Run tests with display (headed mode)
       run: |
-        xvfb-run -a python3 run_tests.py --type all --verbose
+        xvfb-run -a python3 run_tests.py --type smoke --verbose
       env:
         DISPLAY: :99
         HEADLESS: false

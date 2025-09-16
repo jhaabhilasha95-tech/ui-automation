@@ -22,7 +22,7 @@ def run_tests(test_type="all", verbose=False, headless=False):
     Run tests based on the specified type.
     
     Args:
-        test_type (str): Type of tests to run (all, smoke, regression)
+        test_type (str): Type of tests to run (all, smoke)
         verbose (bool): Run tests in verbose mode
         headless (bool): Run tests in headless mode
     """
@@ -34,8 +34,9 @@ def run_tests(test_type="all", verbose=False, headless=False):
     # Add test selection
     if test_type == "smoke":
         cmd.extend(["-m", "smoke"])
-    elif test_type == "regression":
-        cmd.extend(["-m", "regression"])
+    elif test_type == "all":
+        # Run all tests without marker filtering
+        pass
     
     # Add verbosity
     if verbose:
@@ -70,7 +71,7 @@ def main():
     parser = argparse.ArgumentParser(description="Twitch UI Automation Test Runner")
     parser.add_argument(
         "--type", 
-        choices=["all", "smoke", "regression"], 
+        choices=["all", "smoke"], 
         default="all",
         help="Type of tests to run (default: all)"
     )

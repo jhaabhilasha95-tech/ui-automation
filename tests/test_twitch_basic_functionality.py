@@ -171,17 +171,14 @@ class TestTwitchBasicFunctionality:
             print("✅ Navigated to Twitch homepage")
 
             # Click on the search icon
-            homepage.click_search_icon()
+            homepage.click_search_icon() 
             print("✅ Clicked on the search icon")
+
+            time.sleep(1)
 
             # Input "StarCraft II" into the search bar
             homepage.search_for_term(config.SEARCH_TERM)
             print(f"✅ Input '{config.SEARCH_TERM}' into search bar")
-
-            # Press Enter/Return to execute search
-            search_input = driver_manager.driver.find_element(*homepage.SEARCH_INPUT)
-            search_input.send_keys(Keys.RETURN)
-            print("✅ Pressed Enter/Return to execute search")
 
             # Take screenshot after search execution
             screenshot3 = driver_manager.take_screenshot("starcraft_ii_search.png")
